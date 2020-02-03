@@ -1,0 +1,94 @@
+<!--removeIf(pymframe)-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iframe Test</title>
+    <link rel="icon" type="image/png" href="//media.philly.com/designimages/favicon-32x32.png" />
+
+    <!--removeIf(tmp)-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cloud.typography.com/7722894/765348/css/fonts.css"
+    />
+    <script defer src="https://pym.nprapps.org/pym.v1.min.js"></script>
+    <script>
+      (function() {
+        var p,
+          t,
+          r = false;
+        function u() {
+          if (!p) p = new pym.Child();
+
+          if (!r) {
+            p.sendMessage('childLoaded', 'ready');
+            window.parent.postMessage(
+              {
+                sentinel: 'amp',
+                type: 'embed-ready',
+              },
+              '*',
+            );
+
+            var m = window.location.search.match(/parentUrl=(https[^&]+)/);
+            if (m && m.length === 2) {
+              var pu = decodeURIComponent(m[1]);
+              var fbt = document.querySelector('meta[property="og:url"]');
+              if (fbt && fbt.content) fbt.content = pu;
+              var twt = document.querySelector('meta[name="twitter:url"]');
+              if (twt && twt.content) twt.content = pu;
+              var cn = document.querySelector('link[rel=canonical]');
+              if (cn && cn.content) cn.href = pu;
+            }
+            r = true;
+          }
+
+          p.sendHeight();
+
+          window.parent.postMessage(
+            {
+              sentinel: 'amp',
+              type: 'embed-size',
+              height: document.body.scrollHeight,
+            },
+            '*',
+          );
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+          if (navigator.userAgent.indexOf('iPhone') > 0) setTimeout(u, 500);
+          else u();
+        });
+        window.addEventListener('resize', function() {
+          if (t) clearTimeout(t);
+          t = setTimeout(u, 200);
+        });
+      })();
+    </script>
+
+    <!--endRemoveIf(tmp)-->
+  </head>
+
+  <body>
+    <!--endRemoveIf(pymframe)-->
+
+    {% include "partials/stylesheets.html" %}
+    <!--removeIf(tmp)-->
+
+    <!--endRemoveIf(tmp)-->
+
+    <!--build:css styles.min.css-->
+    <link rel="stylesheet" href="css/styles.css" />
+    <!--endbuild-->
+
+    {% include "main-body.html" ignore missing %} {% include "partials/script-links.html" %}
+
+    <!--build:js main.min.js -->
+    <script src="js/main.js"></script>
+    <!-- endbuild -->
+
+    <!--removeIf(pymframe)-->
+  </body>
+</html>
+<!--endRemoveIf(pymframe)-->
