@@ -7,7 +7,7 @@ body {
 }
 
 .graphicWrapper {
-  // padding: 25px 10px;
+  padding: 25px 10px;
   margin: 20px auto;
   // border-top: 3px solid #eee;
   // border-bottom: 3px solid #eee;
@@ -41,7 +41,7 @@ body {
 .credits
 {
   display:grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto 40px auto;
 }
 
 .axislabel {
@@ -69,28 +69,25 @@ figure
 {
   margin: 0px;
   width: 100%;
-
+  height: 200px;
+  @media( min-width: 500px )
+  {
+      height: 300px;
+  }
 }
 
 
-$rotation: 0;
 
-// $colorA: adjust-hue( hsl(188, 96%, 29%), $rotation );
-// $colorB: adjust-hue( hsl(340, 74%, 38%), $rotation );
+$colorA: #009C8A;
+$colorB: #FC5F2A;
 
-$colorA: #009C8A;//#00E199;
-$colorB: #FC5F2A;//#006BF7;
-// $colorA: hsl( 75, 100%, 36%);
-// $colorB: hsl( 340, 74%, 38% );
 
 svg
 {
-  // background: #AAA;
+
   circle
   {
     transition: all .3s;
-    // stroke: #222;
-    // stroke-width: 2px;
   }
 
   circle:nth-child(1)
@@ -119,7 +116,7 @@ svg
     font-size: 12px;
     fill: #FFF;
     letter-spacing: 2px;
-    // text-shadow: 1px 1px 3px rgba(0,0,0,1);
+
     font-family: $philly-serif;
     font-weight: 100;
     text-rendering: optimizeLegibility;
@@ -129,13 +126,11 @@ svg
     {
       &:nth-of-type(1)
       {
-        transform: translate(-100px, 0px);
         fill: $colorA;
       }
 
       &:nth-of-type(2)
       {
-        transform: translate(100px, 0px);
         fill: $colorB;
       }
     }
@@ -158,6 +153,8 @@ svg
 
 }
 
+
+
 select
 {
   display: inline-block;
@@ -173,32 +170,41 @@ select
   border-bottom: 2px dotted $philly-gray;
   border-radius: 0px;
 
-  &.main
-  {
-    // width: 50px;
-  }
+
 
   &.temp
   {
     display: none;
   }
 
-  &::after
+
+  &+.dropdown
   {
-    content: "v";
-    display: block;
+    color:red;
+    position: relative;
+    left:-10px;
+    margin-right: -10px;
+    z-index: -1;
   }
 
   &:nth-of-type(1)
   {
     color: $colorA;
     border-color: $colorA;
+    &+.dropdown
+    {
+      color: $colorA;
+    }
   }
 
   &:nth-of-type(2)
   {
     color: $colorB;
     border-color: $colorB;
+    &+.dropdown
+    {
+      color: $colorB;
+    }
   }
 }
 

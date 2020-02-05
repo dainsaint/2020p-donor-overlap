@@ -37,7 +37,7 @@ const data = `Exclusive_donors,Candidate,Candidate_full,Most_popular,Overlap,Ben
 9072,Yang,Andrew Yang,Sanders,11.11%,109,269,349,85,773,314,16,29,743,168,218,311,32,229,260,13,20,2,177,3,29,1373,26,226,43,853,291,,12362
 `
 
-const templateString = `<p>That's about {{ percentA }}% of <span class="colorA">{{ candidateA | safe }}</span> {{ totalA }} donors and {{ percentB }}% of <span class="colorB">{{ candidateB | safe }}</span> {{ totalB }} donors.</p>`;
+const templateString = `<p>That's {{ percentA }}% of <span class="colorA">{{ candidateA | safe }}</span> {{ totalA }} donors and {{ percentB }}% of <span class="colorB">{{ candidateB | safe }}</span> {{ totalB }} donors.</p>`;
 
 
 Sugar.extend();
@@ -49,7 +49,8 @@ const lerp = function( a, b, t )
 }
 
 const donors = [];
-const startingSelection = ['Warren', 'Buttigieg'];
+const startingSelection = ['Warren', 'Hickenlooper'];
+const template = Nunjucks.compile( templateString );
 
 D3.csvParse( data, row => donors.push(row) );
 D3.selectAll("select.main").html( null );
@@ -63,29 +64,23 @@ donors.forEach( ( row ) => D3.selectAll("select.main")
 );
 
 
-function sizeSelect( select )
-{
-  var targetId = "#" + $("#"+select).attr( "id" )+"-temp";
-  console.log( $( targetId ).html() );
-  $(targetId).find("option").html( $("#" + $("#"+select).attr( "id" ) + " option:selected").text() );
-  $("#"+select).width( $(targetId).width() );
-  $("#"+select).blur();
-}
+
+
 
 D3.selectAll("select")
   .on("change", (d) => refresh() );
 
 
 
-const template = Nunjucks.compile( templateString );
 
 
-const canvasWidth = 730;
-const canvasHeight = 300;
+const canvasSize = {
+  width: 730,
+  height: 300
+}
 
 const svg = D3.select("figure svg")
-  // .attr( "width", canvasWidth )
-  .attr( "height", canvasHeight );
+  .attr( "height", canvasSize.height );
 
 
 const group = svg.append("g");
@@ -106,17 +101,17 @@ const labels = group
 //
 // D3.select("svg")
 //   .append("line")
-//   .attr( "x1", canvasWidth/2)
+//   .attr( "x1", canvasSize.width/2)
 //   .attr( "y1", 0)
-//   .attr( "x2", canvasWidth/2)
-//   .attr( "y1", canvasHeight);
+//   .attr( "x2", canvasSize.width/2)
+//   .attr( "y1", canvasSize.height);
 //
 //   D3.select("svg")
 //     .append("line")
 //     .attr( "x1", 0)
-//     .attr( "y1", canvasHeight/2)
-//     .attr( "x2", canvasWidth)
-//     .attr( "y2", canvasHeight/2);
+//     .attr( "y1", canvasSize.height/2)
+//     .attr( "x2", canvasSize.width)
+//     .attr( "y2", canvasSize.height/2);
 
 
 refresh();
@@ -127,14 +122,25 @@ function center()
 {
   // console.log( group.node().getBBox() );
     window.requestAnimationFrame( () => {
+
+      const shouldRefresh = document.getElementById("diagram").clientWidth != canvasSize.width || document.getElementById("diagram").clientHeight != canvasSize.height;
+
+      canvasSize.width = document.getElementById("diagram").clientWidth;
+      canvasSize.height = document.getElementById("diagram").clientHeight;
+
+      if( shouldRefresh )
+        refresh();
+
       const rect = group.node().getBBox();
       const cX = rect.x + rect.width/2;
       const cY = rect.y + rect.height/2;
-      const dX = canvasWidth/2 - cX;
-      const dY = canvasHeight/2 - cY;
+      const dX = canvasSize.width/2 - cX;
+      const dY = canvasSize.height/2 - cY;
 
       group
         .attr('transform', `translate(${dX}, ${dY})`);
+
+
 
       center();
     });
@@ -165,7 +171,7 @@ function circleOverlap(r1, r2, d) {
 function redraw( data, circles )
 {
   const margin = 10;
-  const targetHeight = canvasHeight * .75 - margin * 2;
+  const targetHeight = canvasSize.height * .75 - margin * 2;
 
   const totals = data.map( d => Math.sqrt(parseInt(d.Total)) );
   const scale = targetHeight / totals.max() / 2;
@@ -176,8 +182,8 @@ function redraw( data, circles )
   const radii = data.map( d => radius( parseInt(d.Total) ) );
   const maxHeight = radii.max() * scale;
 
-  const cX = canvasWidth/2;
-  const cY = canvasHeight/2;
+  const cX = canvasSize.width/2;
+  const cY = canvasSize.height/2;
 
   const maxOverlapDistance = radii[0] - radii[1];
   const minOverlapDistance = radii[0] + radii[1];
@@ -233,15 +239,15 @@ function redraw( data, circles )
     .attr( "y", d => cY  )
     .attr( "dy", 0)
     .html( ({Candidate, Total}, i) => `<tspan x="${ i * spacing }" dy="-4">${Candidate}</tspan><tspan x="${ i * spacing }" dy="16">${ parseInt( Total ).format(0)  }</tspan>` )
-    .attr( "style", (data, i, elements) => {
+    .attr( "transform", (data, i, elements) => {
       const bounds = elements[i].getBBox();
       const direction = i == 0 ? -1 : 1;
       const textMargin = 10;
       const offset = radii[i] < 40
         ? direction * (radii[i] + bounds.width/2 + textMargin)
         : 0;
-
-      return `transform: translate(${offset}px, 0)`;
+      console.log( data.Candidate, offset );
+      return `translate(${offset}, 0)`;
     })
 
 
@@ -269,8 +275,8 @@ function refresh()
   const view = {
     candidateA: candidateA + (candidateA.last() == 's' ? '&rsquo;' : '&rsquo;s'),
     candidateB: candidateB + (candidateB.last() == 's' ? '&rsquo;' : '&rsquo;s'),
-    percentA: percentA < 0.1 ? "<1" : percentA.format(0),
-    percentB: percentB < 0.1 ? "<1" : percentB.format(0),
+    percentA: percentA < 1 ? "less than 1" : "about " + percentA.format(0),
+    percentB: percentB < 1 ? "less than 1" : percentB.format(0),
     totalA: parseInt( datumA[ "Total" ] ).format(0),
     totalB: parseInt( datumB[ "Total" ] ).format(0),
     overlap: parseInt(datumA[ candidateB ]).format(0)
@@ -278,4 +284,34 @@ function refresh()
 
   document.getElementById("number").innerHTML = Nunjucks.renderString( "{{ overlap }} Pennsylvanians", view );
   document.getElementById("description").innerHTML = template.render( view );
+
+
+  const candidateAOptions = Array.from( document.querySelectorAll("#candidate-a option") );
+  const candidateBOptions = Array.from( document.querySelectorAll("#candidate-b option") );
+
+  candidateAOptions.forEach( option => option.toggleAttribute('disabled', option.text == datumB.Candidate_full) );
+  candidateBOptions.forEach( option => option.toggleAttribute('disabled', option.text == datumA.Candidate_full) );
+
 }
+
+
+
+function sizeSelect( select )
+{
+  var targetId = "#" + $("#"+select).attr( "id" )+"-temp";
+  $(targetId).find("option").html( $("#" + $("#"+select).attr( "id" ) + " option:selected").text() +"&nbsp;&#9662;");
+  $("#"+select).width( $(targetId).width() );
+  $("#"+select).blur();
+}
+
+function openSelect( id )
+{
+  const dropdown = document.getElementById(id);
+  console.log( dropdown );
+  var event = document.createEvent('MouseEvents');
+  event.initMouseEvent('mousedown', true, true, window);
+  console.log( event );
+  dropdown.dispatchEvent(event);
+}
+
+$("label").click( function(e) { e.preventDefault(); openSelect( $(this).attr("for") )} );
