@@ -125,10 +125,25 @@ svg
     text-rendering: optimizeLegibility;
     transition: all .3s;
 
+    &.offset
+    {
+      &:nth-of-type(1)
+      {
+        transform: translate(-100px, 0px);
+        fill: $colorA;
+      }
+
+      &:nth-of-type(2)
+      {
+        transform: translate(100px, 0px);
+        fill: $colorB;
+      }
+    }
+
+
     tspan
     {
 
-        // display: none;
     }
 
     tspan:nth-child(2)

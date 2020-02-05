@@ -83,19 +83,20 @@ const template = Nunjucks.compile( templateString );
 const canvasWidth = 730;
 const canvasHeight = 300;
 
-const svg = D3.select("figure")
-  .append("svg")
-  .attr( "width", canvasWidth )
+const svg = D3.select("figure svg")
+  // .attr( "width", canvasWidth )
   .attr( "height", canvasHeight );
 
 
-const circles = D3.select( "svg" )
+const group = svg.append("g");
+
+const circles = group
   .selectAll("circle")
   .data( [1, 2] )
   .enter()
   .append("circle")
 
-const labels = D3.select( "svg ")
+const labels = group
   .selectAll("text")
   .data( [{ Candidate: 'Warren', Total: 14881}, { Candidate:'Buttigieg', Total: 13409}] )
   .enter()
@@ -119,6 +120,26 @@ const labels = D3.select( "svg ")
 
 
 refresh();
+center();
+
+
+function center()
+{
+  // console.log( group.node().getBBox() );
+    window.requestAnimationFrame( () => {
+      const rect = group.node().getBBox();
+      const cX = rect.x + rect.width/2;
+      const cY = rect.y + rect.height/2;
+      const dX = canvasWidth/2 - cX;
+      const dY = canvasHeight/2 - cY;
+
+      group
+        .attr('transform', `translate(${dX}, ${dY})`);
+
+      center();
+    });
+}
+
 
 function circleArea(r, width) {
     return r * r * Math.acos(1 - width/r) - (r - width) * Math.sqrt(width * (2 * r - width));
@@ -148,11 +169,8 @@ function redraw( data, circles )
 
   const totals = data.map( d => Math.sqrt(parseInt(d.Total)) );
   const scale = targetHeight / totals.max() / 2;
-  console.log( "SCALE", targetHeight, totals.max(), scale );
+
   const radius = donorCount => Math.sqrt(donorCount) * scale;
-
-
-
 
 
   const radii = data.map( d => radius( parseInt(d.Total) ) );
@@ -191,11 +209,10 @@ function redraw( data, circles )
 
   }
 
-  console.log( ov, overlapCalculated, overlap, spacing, failsafe);
+  // console.log( ov, overlapCalculated, overlap, spacing, failsafe);
 
   if( ov == 0 )
     spacing = minOverlapDistance + 10;
-
 
 
 
@@ -204,21 +221,28 @@ function redraw( data, circles )
   const offsetX = cX + radii[0] - width/2;
 
 
-
   circles
     .data( data )
-    .attr( "cx", (d, i) => offsetX + i * spacing )
+    .attr( "cx", (d, i) => i * spacing )
     .attr( "cy", d => cY  )
     .attr( "r", (d,i) => radii[i] );
 
   labels
     .data( data )
-    .attr( "x", (d, i) => offsetX + i * spacing )
+    .classed( "offset", (d, i) => radii[i] < 40)
     .attr( "y", d => cY  )
     .attr( "dy", 0)
-    .html( ({Candidate, Total}, i) => `<tspan x="${ offsetX + i * spacing }" dy="0">${Candidate}</tspan><tspan x="${ offsetX + i * spacing }" dy="16">${ parseInt( Total ).format(0)  }</tspan>` )
+    .html( ({Candidate, Total}, i) => `<tspan x="${ i * spacing }" dy="-4">${Candidate}</tspan><tspan x="${ i * spacing }" dy="16">${ parseInt( Total ).format(0)  }</tspan>` )
+    .attr( "style", (data, i, elements) => {
+      const bounds = elements[i].getBBox();
+      const direction = i == 0 ? -1 : 1;
+      const textMargin = 10;
+      const offset = radii[i] < 40
+        ? direction * (radii[i] + bounds.width/2 + textMargin)
+        : 0;
 
-
+      return `transform: translate(${offset}px, 0)`;
+    })
 
 
 }
