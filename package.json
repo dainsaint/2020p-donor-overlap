@@ -1,5 +1,5 @@
 {
-  "name": "iframe-generator-test",
+  "name": "2020p-donor-overlap",
   "version": "1.0.0",
   "description": "",
   "main": "gulpfile.js",
@@ -39,5 +39,10 @@
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "d3": "^5.15.0",
+    "nunjucks": "^3.2.0",
+    "sugar": "^2.0.6",
+    "venn.js": "^0.2.20"
+  }
 }

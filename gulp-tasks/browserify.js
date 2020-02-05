@@ -17,7 +17,7 @@ module.exports = (gulp, browserSync) => function browserifyTask(cb) {
       console.log(err);
     })
     .transform(babelify, {
-      presets: ['env'],
+      presets: ['env', "@babel/preset-react", "@babel/preset-env"],
     })
     .on('error', (err) => {
       console.log(err);

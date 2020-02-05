@@ -2,15 +2,15 @@
 
 
 body {
-    font-family: $philly-sans;
+    font-family: $philly-serif;
     margin: 0 auto;
 }
 
 .graphicWrapper {
-  padding: 25px 10px;
+  // padding: 25px 10px;
   margin: 20px auto;
-  border-top: 3px solid #eee;
-  border-bottom: 3px solid #eee;
+  // border-top: 3px solid #eee;
+  // border-bottom: 3px solid #eee;
   max-width: 728px;
 }
 
@@ -32,20 +32,182 @@ body {
     font-size: 13px;
     font-family: $philly-sans;
     color: $philly-gray;
-    display: block;
-    text-align: left;
-    padding: 4px 0 0 0;
-    &:first-of-type {
-      padding-top: 20px;
-    }
 }
 
 .credit {
   text-align: right;
 }
 
+.credits
+{
+  display:grid;
+  grid-template-columns: auto auto;
+}
+
 .axislabel {
     font-size: 12px;
     color: #333;
     font-family: $philly-sans;
+}
+
+nav
+{
+  display: grid;
+  grid-template-columns: auto 40px auto;
+
+  div
+  {
+    text-align: center;
+    font-size: 16px;
+
+    font-weight: bold;
+  }
+
+}
+
+figure
+{
+  margin: 0px;
+  width: 100%;
+
+}
+
+
+$rotation: 0;
+
+// $colorA: adjust-hue( hsl(188, 96%, 29%), $rotation );
+// $colorB: adjust-hue( hsl(340, 74%, 38%), $rotation );
+
+$colorA: #009C8A;//#00E199;
+$colorB: #FC5F2A;//#006BF7;
+// $colorA: hsl( 75, 100%, 36%);
+// $colorB: hsl( 340, 74%, 38% );
+
+svg
+{
+  // background: #AAA;
+  circle
+  {
+    transition: all .3s;
+    // stroke: #222;
+    // stroke-width: 2px;
+  }
+
+  circle:nth-child(1)
+  {
+      fill: $colorA;
+  }
+
+  circle:nth-child(2)
+  {
+    fill: $colorB;
+    mix-blend-mode: multiply;
+  }
+
+
+  line
+  {
+    stroke: #DDD;
+  }
+
+  text
+  {
+    text-align: center;
+    text-transform: uppercase;
+    text-anchor: middle;
+    font-weight: 100;
+    font-size: 12px;
+    fill: #FFF;
+    letter-spacing: 2px;
+    // text-shadow: 1px 1px 3px rgba(0,0,0,1);
+    font-family: $philly-serif;
+    font-weight: 100;
+    text-rendering: optimizeLegibility;
+    transition: all .3s;
+
+    tspan
+    {
+
+        // display: none;
+    }
+
+    tspan:nth-child(2)
+    {
+      font-family: $philly-sans;
+      font-weight: 900;
+      font-size: 16px;
+
+    }
+
+  }
+
+}
+
+select
+{
+  display: inline-block;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  border: none;
+  background: none;
+
+  font-family: $philly-serif;
+
+  border-bottom: 2px dotted $philly-gray;
+  border-radius: 0px;
+
+  &.main
+  {
+    // width: 50px;
+  }
+
+  &.temp
+  {
+    display: none;
+  }
+
+  &::after
+  {
+    content: "v";
+    display: block;
+  }
+
+  &:nth-of-type(1)
+  {
+    color: $colorA;
+    border-color: $colorA;
+  }
+
+  &:nth-of-type(2)
+  {
+    color: $colorB;
+    border-color: $colorB;
+  }
+}
+
+.colorA
+{
+  color: $colorA;
+}
+
+.colorB
+{
+  color: $colorB;
+}
+
+
+#number
+{
+  font-weight: bold;
+}
+
+p.intro
+{
+  font-size: 16px;
+  select
+  {
+    font-size: 16px;
+  }
 }
