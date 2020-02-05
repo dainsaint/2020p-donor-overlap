@@ -4,14 +4,28 @@
 body {
     font-family: $philly-serif;
     margin: 0 auto;
+
+    line-height: 1.44;
+    font-size: 18px;
+    letter-spacing: -.2px;
+    color: $philly-darkgray;
+
+    @media (min-width: 550px )
+    {
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: -.2px;
+    }
+
+    -webkit-font-smoothing: antialiased;
 }
 
 .graphicWrapper {
-  padding: 25px 10px;
-  margin: 20px auto;
-  // border-top: 3px solid #eee;
-  // border-bottom: 3px solid #eee;
-  max-width: 728px;
+  // padding: 25px 10px;
+  // margin: 20px auto;
+  // // border-top: 3px solid #eee;
+  // // border-bottom: 3px solid #eee;
+  // max-width: 728px;
 }
 
 .heading {
@@ -70,7 +84,7 @@ figure
   margin: 0px;
   width: 100%;
   height: 200px;
-  @media( min-width: 500px )
+  @media( min-width: 550px  )
   {
       height: 300px;
   }
@@ -169,6 +183,17 @@ select
 
   border-bottom: 2px dotted $philly-gray;
   border-radius: 0px;
+
+  line-height: 1.44;
+  font-size: 18px;
+  letter-spacing: -.2px;
+
+  @media (min-width: 550px )
+  {
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: -.2px;
+  }
 
 
 
