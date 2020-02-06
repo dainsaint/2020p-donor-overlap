@@ -4,7 +4,6 @@
 const D3 = require('d3');
 const Sugar = require('sugar');
 const Nunjucks = require('nunjucks');
-const Venn = require('venn.js');
 
 const data = `Exclusive_donors,Candidate,Candidate_full,status,most_popular,overlap,Bennet,Biden,Booker,Bullock,Buttigieg,Castro,de Blasio,Delaney,Gabbard,Gillibrand,Gravel,Harris,Hickenlooper,Inslee,Klobuchar,Messam,Moulton,Ojeda,O’Rourke,Patrick,Ryan,Sanders,Sestak,Steyer,Swalwell,Warren,Williamson,Yang,Total
 634,Bennet,Michael Bennet,Still in race,Buttigieg,27.25%,,448,376,273,549,316,14,46,70,198,18,282,46,257,491,5,44,0,169,6,63,154,36,259,95,397,64,109,2015
@@ -114,6 +113,11 @@ const labels = group
 
 refresh();
 center();
+
+function width( el )
+{
+  return parseFloat(getComputedStyle(el, null).width.replace("px", ""))
+}
 
 
 function center()
@@ -252,8 +256,8 @@ function redraw( data, circles )
 
 function refresh()
 {
-  sizeSelect( "candidate-a" );
-  sizeSelect( "candidate-b" );
+  sizeSelect( "#candidate-a" );
+  sizeSelect( "#candidate-b" );
 
   const values = Array.from( document.getElementsByTagName( "select" ) ).map( 'value' );
   const [ candidateA, candidateB ] = values;
@@ -292,12 +296,23 @@ function refresh()
 }
 
 
-function sizeSelect( select )
+function sizeSelect( id )
 {
-  var targetId = "#" + $("#"+select).attr( "id" )+"-temp";
-  $(targetId).find("option").html( $("#" + $("#"+select).attr( "id" ) + " option:selected").text() +"&nbsp;&#9662;");
-  $("#"+select).width( $(targetId).width() );
-  $("#"+select).blur();
+  const targetId = `${id}-temp`;
+  const dropdownCaret = "&nbsp;&#9662;";
+
+  const select = document.querySelector(id);
+  const currentSelection = select.options[ select.selectedIndex ].innerHTML + dropdownCaret;
+
+  const tempSelect = document.querySelector( targetId );
+  const tempOption = document.querySelector(`${targetId} option`);
+
+  tempOption.innerHTML = currentSelection;
+  tempSelect.style.display = "inline-block";
+  select.style.width = width( tempSelect ) + "px";
+  tempSelect.style.display = "none";
+
+  select.blur();
 }
 
 function openSelect( id )
@@ -307,5 +322,3 @@ function openSelect( id )
   event.initMouseEvent('mousedown', true, true, window);
   dropdown.dispatchEvent(event);
 }
-
-$("label").click( function(e) { e.preventDefault(); openSelect( $(this).attr("for") )} );
