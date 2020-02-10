@@ -48,7 +48,7 @@ const lerp = function( a, b, t )
 }
 
 const donors = [];
-const startingSelection = ['Warren', 'Biden'];
+const startingSelection = ['Sanders', 'Patrick'];
 const template = Nunjucks.compile( templateString );
 
 D3.csvParse( data, row => donors.push(row) );
@@ -190,42 +190,28 @@ function redraw( data, circles )
   const maxOverlapDistance = radii[0] - radii[1];
   const minOverlapDistance = radii[0] + radii[1];
 
-  const overlap = parseInt( data[0][ data[1].Candidate ] ) / parseInt( data[0].Total );
-  const ov = parseInt( data[0][ data[1].Candidate ] );
-  // const spacing = 0;//lerp( minOverlapDistance, maxOverlapDistance, overlap );
+  const overlapPercent = parseInt( data[0][ data[1].Candidate ] ) / parseInt( data[0].Total );
+  const overlapDiscrete = parseInt( data[0][ data[1].Candidate ] );
 
   var spacing = 0;
+  var overlapPercentCalculated;
+  var overlapDelta = Infinity;
+  var lastOverlapDelta = Infinity;
 
-  var failsafe = 2000;
-  var overlapCalculated = circleOverlap( radii[0], radii[1], spacing ) / (Math.PI * radii[0] * radii[0]);
-
-
-  var shouldDecrease = overlapCalculated > overlap;
-  // console.log( overlapCalculated, overlap, shouldDecrease);
-
-  var overlapDistance = Math.abs( overlap - overlapCalculated );
-  var lastOverlapDistance = overlapDistance;
-
-  while( failsafe >= 0 && ov > 0 && overlapDistance <= lastOverlapDistance  )
-  {
-    overlapCalculated = circleOverlap( radii[0], radii[1], spacing ) / (Math.PI * radii[0] * radii[0]);
+  do {
+    overlapPercentCalculated = circleOverlap( radii[0], radii[1], spacing ) / (Math.PI * radii[0] * radii[0]);
     spacing += 1;
-    failsafe--;
+    lastOverlapDelta = overlapDelta;
+    overlapDelta = Math.abs( overlapPercent - overlapPercentCalculated );
+  } while ( overlapDiscrete > 0 && overlapDelta <= lastOverlapDelta && spacing < radii[0] + radii[1] );
 
-    lastOverlapDistance = overlapDistance;
-    overlapDistance = Math.abs( overlap - overlapCalculated );
 
-  }
-
-  // console.log( ov, overlapCalculated, overlap, spacing, failsafe);
-
-  if( ov == 0 )
+  if( overlapDiscrete == 0 )
     spacing = minOverlapDistance + 10;
 
 
 
   const width = radii[0] + Math.min( radii[0] + radii[1], spacing ) + radii[1];
-  // const currentX = -radii[0] + width/2;
   const offsetX = cX + radii[0] - width/2;
 
 
@@ -237,7 +223,7 @@ function redraw( data, circles )
 
   labels
     .data( data )
-    .classed( "offset", (d, i) => radii[i] < 40)
+    .classed( "offset", (d, i) => radii[i] < 50)
     .attr( "y", d => cY  )
     .attr( "dy", 0)
     .html( ({Candidate, Total}, i) => `<tspan x="${ i * spacing }" dy="-4">${Candidate}</tspan><tspan x="${ i * spacing }" dy="16">${ parseInt( Total ).format(0)  }</tspan>` )
@@ -245,7 +231,7 @@ function redraw( data, circles )
       const bounds = elements[i].getBBox();
       const direction = i == 0 ? -1 : 1;
       const textMargin = 10;
-      const offset = radii[i] < 40
+      const offset = radii[i] < 50
         ? direction * (radii[i] + bounds.width/2 + textMargin)
         : 0;
       return `translate(${offset}, 0)`;
