@@ -4,14 +4,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Iframe Test</title>
+    <title>Where They Overlap</title>
     <link rel="icon" type="image/png" href="//media.philly.com/designimages/favicon-32x32.png" />
 
     <link rel="stylesheet" type="text/css" href="https://cloud.typography.com/7722894/7623412/css/fonts.css"/>
 
     <!--removeIf(tmp)-->
 
-  
+
     <script defer src="https://pym.nprapps.org/pym.v1.min.js"></script>
     <script>
       (function() {
@@ -46,6 +46,9 @@
 
           p.sendHeight();
 
+          // console.log( document.getElementsByTagName('body')[0].offsetHeight.toString(), );
+
+
           window.parent.postMessage(
             {
               sentinel: 'amp',
@@ -62,7 +65,15 @@
         window.addEventListener('resize', function() {
           if (t) clearTimeout(t);
           t = setTimeout(u, 200);
-        });
+        })
+
+        window.addEventListener('reflow', function() {
+          // console.log('reflow');
+          if (t) clearTimeout(t);
+          t = setTimeout(u, 200);
+        })
+
+        ;
       })();
     </script>
 

@@ -48,7 +48,7 @@ const lerp = function( a, b, t )
 }
 
 const donors = [];
-const startingSelection = ['Sanders', 'Patrick'];
+const startingSelection = ['Warren', 'Biden'];
 const template = Nunjucks.compile( templateString );
 
 D3.csvParse( data, row => donors.push(row) );
@@ -278,6 +278,11 @@ function refresh()
 
   candidateAOptions.forEach( option => option.toggleAttribute('disabled', option.dataset.heading == "true" || option.text == datumB.Candidate_full) );
   candidateBOptions.forEach( option => option.toggleAttribute('disabled', option.dataset.heading == "true" || option.text == datumA.Candidate_full) );
+
+  window.requestAnimationFrame( () => {
+      window.dispatchEvent(new Event("reflow") );
+  })
+
 
 }
 
